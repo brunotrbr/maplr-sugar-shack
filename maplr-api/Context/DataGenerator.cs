@@ -14,7 +14,7 @@ namespace maplr_api.Context
 
         public void InsertData()
         {
-            if (!_maplrContext.MapleSyrup.Any())
+            if (_maplrContext.MapleSyrup.Any() == false)
             {
                 List<MapleSyrup> items = new List<MapleSyrup>();
                 using (StreamReader r = new StreamReader("MapleSyrup.json"))

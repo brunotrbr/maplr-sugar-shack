@@ -1,17 +1,12 @@
-﻿using maplr_api.Models;
+﻿using maplr_api.DTO;
+using maplr_api.Utils;
 
 namespace maplr_api.Interfaces
 {
     public interface IMapleSyrupRepository
     {
-        Task<IQueryable<MapleSyrup>> Get();
+        Task<IQueryable<CatalogueItemDto>> Get(Enums.Type type);
 
-        Task<MapleSyrup?> GetByKey(string key);
-
-        Task<MapleSyrup> Insert(MapleSyrup entity);
-
-        Task<MapleSyrup> Update(string key, MapleSyrup entity);
-
-        Task<string> Delete(string key);
+        Task<CatalogueItemDto?> GetByKey(string key);
     }
 }

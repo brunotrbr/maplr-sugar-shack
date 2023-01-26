@@ -1,69 +1,75 @@
-﻿using maplr_api.Context;
+﻿using AutoMapper;
+using maplr_api.Context;
+using maplr_api.DTO;
 using maplr_api.Interfaces;
 using maplr_api.Models;
+using maplr_api.Utils;
+using System.Linq.Expressions;
 
 namespace maplr_api.Repository
 {
     public class MapleSyrupRepository : IMapleSyrupRepository
     {
         private readonly MaplrContext _context;
+        public readonly IMapper _mapper;
 
         public MapleSyrupRepository(MaplrContext maplrContext)
         {
             _context = maplrContext;
+            _mapper = InitializeAutomapper();
         }
 
-        public Task<string> Delete(string key)
+        static Mapper InitializeAutomapper()
+        {
+            var config = new MapperConfiguration(cfg => {
+                cfg.CreateMap<MapleSyrup, CatalogueItemDto>()
+                  .ForSourceMember(src => src.Description, opt => opt.DoNotValidate())
+                   .AfterMap((src, dest) => dest.MaxQty = src.Stock);
+            });
+            var mapper = new Mapper(config);
+            return mapper;
+        }
+
+        private CatalogueItemDto mapleSyrupToDto(MapleSyrup mapleSyrup)
+        {
+            return _mapper.Map<CatalogueItemDto>(mapleSyrup);
+        }
+
+        public Task<IQueryable<CatalogueItemDto>> Get(Enums.Type type)
         {
             return Task.Run(() =>
             {
-                var entity = _context.Find<string>(key);
+                var query = _context.Set<MapleSyrup>().AsQueryable();
 
-                if (entity == null)
+                if (type != 0)
                 {
-                    throw new Exception("ID inexistente.");
+                    query = query.Where(x => x.Type.Equals(type));
                 }
 
-                _context.Remove(entity);
-                _context.SaveChanges();
-                return key;
+                if (query.Any())
+                {
+                    var responseList = new List<CatalogueItemDto>();
+                    foreach (MapleSyrup mapleSyrup in query)
+                    {
+                        responseList.Add(mapleSyrupToDto(mapleSyrup));
+                    }
+                    return responseList.AsQueryable();
+                }
+                return new List<CatalogueItemDto>().AsQueryable();
             });
         }
 
-        public Task<IQueryable<MapleSyrup>> Get()
+        public Task<CatalogueItemDto?> GetByKey(string key)
         {
             return Task.Run(() =>
             {
-                var data = _context.Set<MapleSyrup>().AsQueryable();
-                return data.Any() ? data : new List<MapleSyrup>().AsQueryable();
-            });
-        }
 
-        public Task<MapleSyrup?> GetByKey(string key)
-        {
-            return Task.Run(() =>
-            {
-                return _context.Find<MapleSyrup>(key);
-            });
-        }
-
-        public Task<MapleSyrup> Insert(MapleSyrup entity)
-        {
-            return Task.Run(() =>
-            {
-                _context.Add(entity);
-                _context.SaveChanges();
-                return entity;
-            });
-        }
-
-        public Task<MapleSyrup> Update(string key, MapleSyrup entity)
-        {
-            return Task.Run(() =>
-            {
-                _context.Update(entity);
-                _context.SaveChanges();
-                return entity;
+                var mapleSyrup = _context.Find<MapleSyrup>(key);
+                if(mapleSyrup != null)
+                {
+                    return mapleSyrupToDto(mapleSyrup);
+                }
+                return null;
             });
         }
     }

@@ -4,6 +4,9 @@ using Microsoft.EntityFrameworkCore;
 using System.Text.Json.Serialization;
 using maplr_api.Interfaces;
 using maplr_api.Repository;
+using AutoMapper;
+using maplr_api.Models;
+using maplr_api.DTO;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -16,6 +19,9 @@ builder.Services.AddSwaggerGen(config =>
 {
     config.SchemaFilter<EnumSchemaFilter>();
 });
+
+builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+
 
 #region Repository Dependency Injection
 
