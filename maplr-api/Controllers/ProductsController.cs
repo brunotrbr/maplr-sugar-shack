@@ -31,7 +31,7 @@ namespace maplr_api.Controllers
         }
 
         [HttpGet("{productId}")]
-        [ProducesResponseType(typeof(CatalogueItemDto), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(MapleSyrupDto), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(string), StatusCodes.Status404NotFound)]
         public async Task<IActionResult> Get(string productId)
         {

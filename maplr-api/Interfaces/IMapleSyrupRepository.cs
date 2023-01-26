@@ -7,6 +7,6 @@ namespace maplr_api.Interfaces
     {
         Task<IQueryable<CatalogueItemDto>> Get(Enums.Type type);
 
-        Task<CatalogueItemDto?> GetByKey(string key);
+        Task<MapleSyrupDto?> GetByKey(string key);
     }
 }

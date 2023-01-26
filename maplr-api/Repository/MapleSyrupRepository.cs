@@ -25,14 +25,21 @@ namespace maplr_api.Repository
                 cfg.CreateMap<MapleSyrup, CatalogueItemDto>()
                   .ForSourceMember(src => src.Description, opt => opt.DoNotValidate())
                    .AfterMap((src, dest) => dest.MaxQty = src.Stock);
+
+                cfg.CreateMap<MapleSyrup, MapleSyrupDto>();
             });
             var mapper = new Mapper(config);
             return mapper;
         }
 
-        private CatalogueItemDto mapleSyrupToDto(MapleSyrup mapleSyrup)
+        private CatalogueItemDto mapleSyrupToCatalogueDto(MapleSyrup mapleSyrup)
         {
             return _mapper.Map<CatalogueItemDto>(mapleSyrup);
+        }
+
+        private MapleSyrupDto mapleSyrupToDto(MapleSyrup mapleSyrup)
+        {
+            return _mapper.Map<MapleSyrupDto>(mapleSyrup);
         }
 
         public Task<IQueryable<CatalogueItemDto>> Get(Enums.Type type)
@@ -51,7 +58,7 @@ namespace maplr_api.Repository
                     var responseList = new List<CatalogueItemDto>();
                     foreach (MapleSyrup mapleSyrup in query)
                     {
-                        responseList.Add(mapleSyrupToDto(mapleSyrup));
+                        responseList.Add(mapleSyrupToCatalogueDto(mapleSyrup));
                     }
                     return responseList.AsQueryable();
                 }
@@ -59,7 +66,7 @@ namespace maplr_api.Repository
             });
         }
 
-        public Task<CatalogueItemDto?> GetByKey(string key)
+        public Task<MapleSyrupDto?> GetByKey(string key)
         {
             return Task.Run(() =>
             {
