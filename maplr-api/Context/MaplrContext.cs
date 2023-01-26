@@ -15,5 +15,6 @@ namespace maplr_api.Context
         }
         public DbSet<MapleSyrup> MapleSyrup { get; set; }
         public DbSet<Orders> Orders { get; set; }
+        public DbSet<Carts> Carts { get; set; }
     }
 }

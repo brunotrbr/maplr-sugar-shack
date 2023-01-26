@@ -27,7 +27,7 @@ builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 #region Repository Dependency Injection
 
 builder.Services.AddScoped(typeof(IMapleSyrupRepository),typeof(MapleSyrupRepository));
-builder.Services.AddScoped(typeof(ICartRepository),typeof(CartRepository));
+builder.Services.AddScoped(typeof(ICartsRepository),typeof(CartsRepository));
 
 #endregion
 
@@ -46,12 +46,16 @@ builder.Services.AddTransient<DataGenerator>();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+// // Configure the HTTP request pipeline.
+// if (app.Environment.IsDevelopment())
+// {
+//     app.UseSwagger();
+//     app.UseSwaggerUI();
+// }
+
+//  Enale swagger in all environments
+app.UseSwagger();
+app.UseSwaggerUI();
 
 app.UseAuthorization();
 

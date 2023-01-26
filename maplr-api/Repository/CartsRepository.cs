@@ -3,17 +3,15 @@ using maplr_api.Context;
 using maplr_api.DTO;
 using maplr_api.Interfaces;
 using maplr_api.Models;
-using maplr_api.Utils;
-using System.Linq.Expressions;
 
 namespace maplr_api.Repository
 {
-    public class CartRepository : ICartRepository
+    public class CartsRepository : ICartsRepository
     {
         private readonly MaplrContext _context;
         public readonly IMapper _mapper;
 
-        public CartRepository(MaplrContext maplrContext)
+        public CartsRepository(MaplrContext maplrContext)
         {
             _context = maplrContext;
             _mapper = InitializeAutomapper();
@@ -23,42 +21,48 @@ namespace maplr_api.Repository
         {
             var config = new MapperConfiguration(cfg =>
             {
-                cfg.CreateMap<MapleSyrup, CatalogueItemDto>()
-                  .ForSourceMember(src => src.Description, opt => opt.DoNotValidate())
-                   .AfterMap((src, dest) => dest.MaxQty = src.Stock);
-
-                cfg.CreateMap<MapleSyrup, MapleSyrupDto>();
+                cfg.CreateMap<Carts, CartLineDto>()
+                  .ForSourceMember(src => src.Id, opt => opt.DoNotValidate());
             });
             var mapper = new Mapper(config);
             return mapper;
         }
 
-        private CartLineDto mapleSyrupToCartLineDto(MapleSyrup mapleSyrup)
+        private CartLineDto CartsToCartLineDto(Carts carts)
         {
-            return _mapper.Map<CartLineDto>(mapleSyrup);
+            return _mapper.Map<CartLineDto>(carts);
         }
-
-        //private MapleSyrupDto mapleSyrupToDto(MapleSyrup mapleSyrup)
-        //{
-        //    return _mapper.Map<MapleSyrupDto>(mapleSyrup);
-        //}
 
         public Task<IQueryable<CartLineDto>> Get()
         {
             return Task.Run(() =>
             {
-                var query = _context.Set<MapleSyrup>().AsQueryable();
+                var query = _context.Set<Carts>().AsQueryable();
 
                 if (query.Any())
                 {
                     var responseList = new List<CartLineDto>();
-                    foreach (MapleSyrup mapleSyrup in query)
+                    foreach (Carts carts in query)
                     {
-                        responseList.Add(mapleSyrupToCartLineDto(mapleSyrup));
+                        responseList.Add(CartsToCartLineDto(carts));
                     }
                     return responseList.AsQueryable();
                 }
                 return new List<CartLineDto>().AsQueryable();
+            });
+        }
+
+        public Task<CartLineDto?> GetByKey(string key)
+        {
+            return Task.Run(() =>
+            {
+
+                var carts = _context.Find<Carts>(key);
+                if(carts != null)
+                {
+                    return CartsToCartLineDto(carts);
+                }
+                return null;
             });
         }
 
@@ -67,9 +71,21 @@ namespace maplr_api.Repository
             throw new NotImplementedException();
         }
 
-        public Task<Guid> Delete(string key)
+        public Task<string> Delete(string key)
         {
-            throw new NotImplementedException();
+            return Task.Run(() =>
+            {
+                var entity = _context.Find<Carts>(key);
+
+                if (entity == null)
+                {
+                    throw new Exception("ID inexistente.");
+                }
+
+                _context.Remove(entity);
+                _context.SaveChanges();
+                return key;
+            });
         }
 
         public Task<CartLineDto> Patch(string key, CartLineDto entity)

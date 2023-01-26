@@ -3,13 +3,15 @@ using maplr_api.Utils;
 
 namespace maplr_api.Interfaces
 {
-    public interface ICartRepository
+    public interface ICartsRepository
     {
         Task<IQueryable<CartLineDto>> Get();
 
+        Task<CartLineDto?> GetByKey(string key);
+
         Task<CartLineDto> Update(string key, CartLineDto entity);
 
-        Task<Guid> Delete(string key);
+        Task<string> Delete(string key);
 
         Task<CartLineDto> Patch(string key, CartLineDto entity);
     }
