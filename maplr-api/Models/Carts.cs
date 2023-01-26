@@ -7,14 +7,11 @@ namespace maplr_api.Models
     public class Carts
     {
         [Key]
-        [JsonPropertyName("id")]
-        public string Id { get; set; }
+        [JsonPropertyName("productId")]
+        public string ProductId { get; set; }
 
         [JsonPropertyName("name")]
         public string Name { get; set; }
-
-        [JsonPropertyName("productId")]
-        public string ProductId { get; set; }
 
         [JsonPropertyName("image")]
         public string Image { get; set; }

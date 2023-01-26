@@ -6,12 +6,12 @@ using maplr_api.Models;
 
 namespace maplr_api.Repository
 {
-    public class CartsRepository : ICartsRepository
+    public class CartRepository : ICartRepository
     {
         private readonly MaplrContext _context;
         public readonly IMapper _mapper;
 
-        public CartsRepository(MaplrContext maplrContext)
+        public CartRepository(MaplrContext maplrContext)
         {
             _context = maplrContext;
             _mapper = InitializeAutomapper();
@@ -21,16 +21,15 @@ namespace maplr_api.Repository
         {
             var config = new MapperConfiguration(cfg =>
             {
-                cfg.CreateMap<Carts, CartLineDto>()
-                  .ForSourceMember(src => src.Id, opt => opt.DoNotValidate());
-                
+                cfg.CreateMap<Carts, CartLineDto>();
+
                 cfg.CreateMap<CartLineDto, Carts>();
             });
             var mapper = new Mapper(config);
             return mapper;
         }
 
-        private CartLineDto CartsToCartLineDto(Carts carts)
+        private CartLineDto CartToCartLineDto(Carts carts)
         {
             return _mapper.Map<CartLineDto>(carts);
         }
@@ -40,18 +39,23 @@ namespace maplr_api.Repository
             return _mapper.Map<Carts>(cartLineDto);
         }
 
-        public Task<IQueryable<CartLineDto>> Get()
+        public Task<IQueryable<CartLineDto>> Get(string productId = "")
         {
             return Task.Run(() =>
             {
                 var query = _context.Set<Carts>().AsQueryable();
+
+                if(string.IsNullOrWhiteSpace(productId) == false)
+                {
+                    query = query.Where(x => x.ProductId.Equals(productId));
+                }
 
                 if (query.Any())
                 {
                     var responseList = new List<CartLineDto>();
                     foreach (Carts carts in query)
                     {
-                        responseList.Add(CartsToCartLineDto(carts));
+                        responseList.Add(CartToCartLineDto(carts));
                     }
                     return responseList.AsQueryable();
                 }
@@ -67,7 +71,7 @@ namespace maplr_api.Repository
                 var carts = _context.Find<Carts>(key);
                 if(carts != null)
                 {
-                    return CartsToCartLineDto(carts);
+                    return CartToCartLineDto(carts);
                 }
                 return null;
             });
@@ -77,7 +81,8 @@ namespace maplr_api.Repository
         {
             return Task.Run(() =>
             {
-                _context.Add(entity);
+                var cart = CartLineDtoToCarts(entity);
+                _context.Add(cart);
                 _context.SaveChanges();
                 return entity;
             });
@@ -88,12 +93,6 @@ namespace maplr_api.Repository
             return Task.Run(() =>
             {
                 var entity = _context.Find<Carts>(key);
-
-                if (entity == null)
-                {
-                    throw new Exception("ID inexistente.");
-                }
-
                 _context.Remove(entity);
                 _context.SaveChanges();
                 return key;

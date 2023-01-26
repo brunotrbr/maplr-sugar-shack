@@ -12,15 +12,15 @@ namespace maplr_api.Controllers
 {
     [Route("[controller]")]
     [ApiController]
-    public class CartsController : ControllerBase
+    public class CartController : ControllerBase
     {
-        private readonly ICartsRepository _cartsRepository;
+        private readonly ICartRepository _cartRepository;
         private readonly IMapleSyrupRepository _mapleSyrupRepository;
         public readonly IMapper _mapper;
 
-        public CartsController(ICartsRepository cartsRepository, IMapleSyrupRepository mapleSyrupRepository)
+        public CartController(ICartRepository cartRepository, IMapleSyrupRepository mapleSyrupRepository)
         {
-            _cartsRepository = cartsRepository;
+            _cartRepository = cartRepository;
             _mapleSyrupRepository = mapleSyrupRepository;
             _mapper = InitializeAutomapper();
         }
@@ -32,7 +32,7 @@ namespace maplr_api.Controllers
                 cfg.CreateMap<MapleSyrupDto, CartLineDto>()
                   .ForSourceMember(src => src.Description, opt => opt.DoNotValidate())
                   .ForSourceMember(src => src.Type, opt => opt.DoNotValidate())
-                  .ForMember(dest => dest.Price, opt => opt.Condition( src => src.Stock > 0) );
+                  .AfterMap((src, dest) => { dest.ProductId = src.Id; dest.Qty = src.Stock > 0 ? 1 : 0; });
             });
             var mapper = new Mapper(config);
             return mapper;
@@ -47,25 +47,8 @@ namespace maplr_api.Controllers
         [ProducesResponseType(typeof(List<CartLineDto>), StatusCodes.Status200OK)]
         public async Task<IActionResult> Get()
         {
-            var carts = await _cartsRepository.Get();
+            var carts = await _cartRepository.Get();
             return Ok(carts);
-        }
-
-        [HttpDelete("{id}")]
-        [ProducesResponseType(StatusCodes.Status202Accepted)]
-        [ProducesResponseType(typeof(string), StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> Delete(string id)
-        {
-            var cartDto = await _cartsRepository.GetByKey(id);
-
-            if (cartDto == null)
-            {
-                var error = "Id inexistente.";
-                return NotFound(error);
-            }
-
-            _ = await _cartsRepository.Delete(id);
-            return Accepted();
         }
 
         [HttpPut]
@@ -74,9 +57,9 @@ namespace maplr_api.Controllers
         [ProducesResponseType(typeof(string), StatusCodes.Status409Conflict)]
         public async Task<IActionResult> Put([FromQuery] string productId)
         {
-            var cartDto = await _cartsRepository.GetByKey(productId);
+            var carts = await _cartRepository.Get(productId);
 
-            if (cartDto != null)
+            if (carts.Any())
             {
                 var error = "Id already exists.";
                 return Conflict(error);
@@ -91,8 +74,25 @@ namespace maplr_api.Controllers
             }
 
             var mappedDto = MapleSyrupDtoToCartLineDto(mapleSyrupDto);
-            _ = _cartsRepository.Update(mappedDto);
+            _ = await _cartRepository.Update(mappedDto);
 
+            return Accepted();
+        }
+
+        [HttpDelete]
+        [ProducesResponseType(StatusCodes.Status202Accepted)]
+        [ProducesResponseType(typeof(string), StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> Delete([FromQuery] string productId)
+        {
+            var cartsDto = await _cartRepository.Get(productId);
+
+            if (cartsDto.Any() == false)
+            {
+                var error = "Id not found.";
+                return NotFound(error);
+            }
+
+            _ = await _cartRepository.Delete(cartsDto.First().ProductId);
             return Accepted();
         }
     }
