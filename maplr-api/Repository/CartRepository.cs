@@ -44,17 +44,22 @@ namespace maplr_api.Repository
         {
             return Task.Run(() =>
             {
-                var query = _context.Set<Carts>().AsQueryable();
+                var dbset = _context.Carts;
+                IQueryable<Carts> data;
 
-                if(string.IsNullOrWhiteSpace(productId) == false)
+                if (string.IsNullOrWhiteSpace(productId))
                 {
-                    query = query.Where(x => x.ProductId.Equals(productId));
+                    data = dbset.AsQueryable();
+                }
+                else
+                {
+                    data = dbset.Where(x => x.ProductId.Equals(productId));
                 }
 
-                if (query.Any())
+                if (data.Any())
                 {
                     var responseList = new List<CartLineDto>();
-                    foreach (Carts carts in query)
+                    foreach (Carts carts in data)
                     {
                         responseList.Add(CartToCartLineDto(carts));
                     }
@@ -75,15 +80,6 @@ namespace maplr_api.Repository
                 }
                 return null;
             });
-            //return Task.Run(() =>
-            //{
-            //    var carts = _context.Find<Carts>(key);
-            //    if(carts != null)
-            //    {
-            //        return CartToCartLineDto(carts);
-            //    }
-            //    return null;
-            //});
         }
 
         public Task<CartLineDto> Update(CartLineDto entity)
@@ -102,7 +98,6 @@ namespace maplr_api.Repository
             return Task.Run(() =>
             {
                 var entity = _context.Carts.First(x => x.ProductId.Equals(key));
-                //var entity = _context.Find<Carts>(key);
                 _context.Remove(entity);
                 _context.SaveChanges();
                 return key;
