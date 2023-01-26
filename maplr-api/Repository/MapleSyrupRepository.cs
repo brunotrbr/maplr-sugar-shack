@@ -46,17 +46,21 @@ namespace maplr_api.Repository
         {
             return Task.Run(() =>
             {
-                var query = _context.Set<MapleSyrup>().AsQueryable();
-
-                if (type != 0)
+                var dbSet = _context.MapleSyrup;
+                IQueryable<MapleSyrup> data;
+                if (type <= 0)
                 {
-                    query = query.Where(x => x.Type.Equals(type));
+                    data = dbSet.AsQueryable();
+                }
+                else
+                {
+                    data = dbSet.Where(x => x.Type.Equals(type)).AsQueryable();
                 }
 
-                if (query.Any())
+                if (data.Any())
                 {
                     var responseList = new List<CatalogueItemDto>();
-                    foreach (MapleSyrup mapleSyrup in query)
+                    foreach (MapleSyrup mapleSyrup in data)
                     {
                         responseList.Add(mapleSyrupToCatalogueDto(mapleSyrup));
                     }
@@ -70,8 +74,7 @@ namespace maplr_api.Repository
         {
             return Task.Run(() =>
             {
-
-                var mapleSyrup = _context.Find<MapleSyrup>(key);
+                var mapleSyrup = _context.MapleSyrup.FirstOrDefault(x => x.Id.Equals(key));
                 if(mapleSyrup != null)
                 {
                     return mapleSyrupToDto(mapleSyrup);
