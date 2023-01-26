@@ -20,12 +20,14 @@ builder.Services.AddSwaggerGen(config =>
     config.SchemaFilter<EnumSchemaFilter>();
 });
 
+#region Adding Automapper to convert from Models to DTO
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
-
+#endregion
 
 #region Repository Dependency Injection
 
 builder.Services.AddScoped(typeof(IMapleSyrupRepository),typeof(MapleSyrupRepository));
+builder.Services.AddScoped(typeof(ICartRepository),typeof(CartRepository));
 
 #endregion
 
