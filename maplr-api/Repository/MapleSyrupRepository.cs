@@ -19,7 +19,7 @@ namespace maplr_api.Repository
             _mapper = InitializeAutomapper();
         }
 
-        static Mapper InitializeAutomapper()
+        private static Mapper InitializeAutomapper()
         {
             var config = new MapperConfiguration(cfg => {
                 cfg.CreateMap<MapleSyrup, CatalogueItemDto>()

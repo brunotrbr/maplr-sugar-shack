@@ -4,10 +4,8 @@
     {
         public string ProductId { get; set; }
         public int Qty { get; set; }
-        public OrderLineDto(string productId, int qty)
+        public OrderLineDto()
         {
-            ProductId = productId;
-            Qty = qty;
         }
     }
 }

@@ -5,10 +5,8 @@
         public bool IsOrderValid { get; set; }
         public string[] errors { get; set; }
 
-        public OrderValidationResponseDto(bool isOrderValid, string[] errors)
+        public OrderValidationResponseDto()
         {
-            IsOrderValid = isOrderValid;
-            this.errors = errors;
         }
     }
 }

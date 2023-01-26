@@ -9,7 +9,7 @@ namespace maplr_api.Interfaces
 
         Task<CartLineDto?> GetByKey(string key);
 
-        Task<CartLineDto> Update(string key, CartLineDto entity);
+        Task<CartLineDto> Update(CartLineDto entity);
 
         Task<string> Delete(string key);
 

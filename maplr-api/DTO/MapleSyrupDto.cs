@@ -12,15 +12,8 @@ namespace maplr_api.DTO
         public int Stock { get; set; }
         public Enums.Type Type { get; set; }
 
-        public MapleSyrupDto(string id, string name, string description, string image, double price, int stock, Enums.Type type)
+        public MapleSyrupDto()
         {
-            Id = id;
-            Name = name;
-            Description = description;
-            Image = image;
-            Price = price;
-            Stock = stock;
-            Type = type;
         }
     }
 }

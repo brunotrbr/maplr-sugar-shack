@@ -17,12 +17,14 @@ namespace maplr_api.Repository
             _mapper = InitializeAutomapper();
         }
 
-        static Mapper InitializeAutomapper()
+        private static Mapper InitializeAutomapper()
         {
             var config = new MapperConfiguration(cfg =>
             {
                 cfg.CreateMap<Carts, CartLineDto>()
                   .ForSourceMember(src => src.Id, opt => opt.DoNotValidate());
+                
+                cfg.CreateMap<CartLineDto, Carts>();
             });
             var mapper = new Mapper(config);
             return mapper;
@@ -31,6 +33,11 @@ namespace maplr_api.Repository
         private CartLineDto CartsToCartLineDto(Carts carts)
         {
             return _mapper.Map<CartLineDto>(carts);
+        }
+
+        private Carts CartLineDtoToCarts(CartLineDto cartLineDto)
+        {
+            return _mapper.Map<Carts>(cartLineDto);
         }
 
         public Task<IQueryable<CartLineDto>> Get()
@@ -66,9 +73,14 @@ namespace maplr_api.Repository
             });
         }
 
-        public Task<CartLineDto> Update(string key, CartLineDto entity)
+        public Task<CartLineDto> Update(CartLineDto entity)
         {
-            throw new NotImplementedException();
+            return Task.Run(() =>
+            {
+                _context.Add(entity);
+                _context.SaveChanges();
+                return entity;
+            });
         }
 
         public Task<string> Delete(string key)
