@@ -1,0 +1,29 @@
+[
+  {
+    "id": "f6fb258d-c33f-4de3-9288-253bc86234b0",
+    "name": "Amber Maple Syrup",
+    "description": "Winding Road 100% Pure Amber Maple Syrup",
+    "image": "https://www.windingroadmaple.ca/uploads/userfiles/images/bottles.png",
+    "price": 8.00,
+    "stock": 10,
+    "type": 1
+  },
+  {
+    "id": "880c684d-770b-4274-9891-c00e08d37f2f",
+    "name": "Dark Maple Syrup",
+    "description": "Winding Road 100% Pure Dark Maple Syrup",
+    "image": "https://www.windingroadmaple.ca/uploads/userfiles/images/bottles.png",
+    "price": 8.50,
+    "stock": 10,
+    "type": 2
+  },
+  {
+    "id": "d7e356c8-5aa1-4cc6-b5a8-c76f51d7906e",
+    "name": "Clear Maple Syrup",
+    "description": "Winding Road 100% Pure Clear Maple Syrup",
+    "image": "https://www.windingroadmaple.ca/uploads/userfiles/images/bottles.png",
+    "price": 7.50,
+    "stock": 18,
+    "type": 3
+  }
+]
