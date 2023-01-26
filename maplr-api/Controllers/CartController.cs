@@ -57,11 +57,11 @@ namespace maplr_api.Controllers
         [ProducesResponseType(typeof(string), StatusCodes.Status409Conflict)]
         public async Task<IActionResult> Put([FromQuery] string productId)
         {
-            var carts = await _cartRepository.Get(productId);
+            var cart = await _cartRepository.GetByKey(productId);
 
-            if (carts.Any())
+            if (cart != null)
             {
-                var error = "Id already exists.";
+                var error = "Product already exists.";
                 return Conflict(error);
             }
 
@@ -69,7 +69,7 @@ namespace maplr_api.Controllers
 
             if (mapleSyrupDto == null)
             {
-                var error = "Id not found.";
+                var error = "Product not found.";
                 return NotFound(error);
             }
 
@@ -84,15 +84,49 @@ namespace maplr_api.Controllers
         [ProducesResponseType(typeof(string), StatusCodes.Status404NotFound)]
         public async Task<IActionResult> Delete([FromQuery] string productId)
         {
-            var cartsDto = await _cartRepository.Get(productId);
+            var cart = await _cartRepository.GetByKey(productId);
 
-            if (cartsDto.Any() == false)
+            if (cart == null)
             {
-                var error = "Id not found.";
+                var error = "Product not found.";
                 return NotFound(error);
             }
 
-            _ = await _cartRepository.Delete(cartsDto.First().ProductId);
+            _ = await _cartRepository.Delete(cart.ProductId);
+            return Accepted();
+        }
+
+        [HttpPatch]
+        [ProducesResponseType(StatusCodes.Status202Accepted)]
+        [ProducesResponseType(typeof(string), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> Patch([FromQuery] string productId, int newQty)
+        {
+            var cart = await _cartRepository.GetByKey(productId);
+
+            if (cart == null)
+            {
+                var error = "Product not found.";
+                return NotFound(error);
+            }
+
+            var mapleSyrupDto = await _mapleSyrupRepository.GetByKey(productId);
+
+            if (mapleSyrupDto == null)
+            {
+                var error = "Product not found.";
+                return NotFound(error);
+            }
+
+            if(mapleSyrupDto.Stock < newQty)
+            {
+                var error = "Insufficiente products in stock.";
+                return BadRequest(error);
+            }
+
+            cart.Qty = newQty;
+
+            _ = await _cartRepository.Patch(cart);
             return Accepted();
         }
     }

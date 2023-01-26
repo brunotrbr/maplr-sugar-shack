@@ -14,6 +14,6 @@ namespace maplr_api.Interfaces
 
         Task<string> Delete(string key);
 
-        Task<CartLineDto> Patch(string key, CartLineDto entity);
+        Task<CartLineDto> Patch(CartLineDto entity);
     }
 }

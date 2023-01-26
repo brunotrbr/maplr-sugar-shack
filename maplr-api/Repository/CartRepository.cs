@@ -3,6 +3,7 @@ using maplr_api.Context;
 using maplr_api.DTO;
 using maplr_api.Interfaces;
 using maplr_api.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace maplr_api.Repository
 {
@@ -67,14 +68,22 @@ namespace maplr_api.Repository
         {
             return Task.Run(() =>
             {
-
-                var carts = _context.Find<Carts>(key);
-                if(carts != null)
+                var carts = _context.Carts.AsNoTracking().FirstOrDefault(x => x.ProductId.Equals(key));
+                if (carts != null)
                 {
                     return CartToCartLineDto(carts);
                 }
                 return null;
             });
+            //return Task.Run(() =>
+            //{
+            //    var carts = _context.Find<Carts>(key);
+            //    if(carts != null)
+            //    {
+            //        return CartToCartLineDto(carts);
+            //    }
+            //    return null;
+            //});
         }
 
         public Task<CartLineDto> Update(CartLineDto entity)
@@ -92,16 +101,23 @@ namespace maplr_api.Repository
         {
             return Task.Run(() =>
             {
-                var entity = _context.Find<Carts>(key);
+                var entity = _context.Carts.First(x => x.ProductId.Equals(key));
+                //var entity = _context.Find<Carts>(key);
                 _context.Remove(entity);
                 _context.SaveChanges();
                 return key;
             });
         }
 
-        public Task<CartLineDto> Patch(string key, CartLineDto entity)
+        public Task<CartLineDto> Patch(CartLineDto entity)
         {
-            throw new NotImplementedException();
+            return Task.Run(() =>
+            {
+                var cart = CartLineDtoToCarts(entity);
+                _context.Update(cart);
+                _context.SaveChanges();
+                return entity;
+            });
         }
     }
 }
