@@ -4,10 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using System.Text.Json.Serialization;
 using maplr_api.Interfaces;
 using maplr_api.Repository;
-using AutoMapper;
-using maplr_api.Models;
-using maplr_api.DTO;
-using maplr_api.Mappers;
+using maplr_api.BusinessLayers;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -47,6 +44,11 @@ options.UseInMemoryDatabase("MaplrDB"));
 #region Adding Data Generator
 
 builder.Services.AddTransient<DataGenerator>();
+#endregion
+
+#region Adding Business Layers
+
+builder.Services.AddScoped<OrdersBL>();
 #endregion
 
 var app = builder.Build();
