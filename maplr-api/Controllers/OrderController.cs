@@ -1,10 +1,6 @@
-﻿using AutoMapper;
-using maplr_api.DTO;
+﻿using maplr_api.DTO;
 using maplr_api.Interfaces;
-using maplr_api.Models;
 using Microsoft.AspNetCore.Mvc;
-
-// For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
 namespace maplr_api.Controllers
 {
@@ -15,36 +11,12 @@ namespace maplr_api.Controllers
         private readonly IOrderRepository _orderRepository;
         private readonly IProductRepository _productRepository;
         private readonly ICartRepository _cartRepository;
-        private readonly IMapper _mapper;
 
         public OrderController(IOrderRepository orderRepository, IProductRepository productRepository, ICartRepository cartRepository)
         {
             _orderRepository = orderRepository;
-            _mapper = InitializeAutomapper();
             _productRepository = productRepository;
             _cartRepository = cartRepository;
-        }
-
-        private static Mapper InitializeAutomapper()
-        {
-            var config = new MapperConfiguration(cfg =>
-            {
-                cfg.CreateMap<Orders, OrderLineDto>();
-
-                cfg.CreateMap<OrderLineDto, Orders>();
-            });
-            var mapper = new Mapper(config);
-            return mapper;
-        }
-
-        private Orders OrderLineDtoToOrders(OrderLineDto orderLineDto)
-        {
-            return _mapper.Map<Orders>(orderLineDto);
-        }
-
-        private OrderLineDto OrdersToOrderLineDto(Orders orders)
-        {
-            return _mapper.Map<OrderLineDto>(orders);
         }
 
         [HttpPost]
