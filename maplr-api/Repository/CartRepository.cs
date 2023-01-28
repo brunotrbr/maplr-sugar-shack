@@ -23,6 +23,7 @@ namespace maplr_api.Repository
         {
             return Task.Run(() =>
             {
+                throw new Exception("Erro interno do servidor");
                 var dbset = _context.Carts;
                 IQueryable<Carts> data;
 
