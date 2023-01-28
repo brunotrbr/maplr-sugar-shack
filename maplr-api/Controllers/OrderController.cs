@@ -1,11 +1,12 @@
 ﻿using maplr_api.BusinessLayers;
 using maplr_api.DTO;
 using maplr_api.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.Diagnostics;
 
 namespace maplr_api.Controllers
 {
+    [Authorize]
     [Route("[controller]")]
     [ApiController]
     public class OrderController : ControllerBase

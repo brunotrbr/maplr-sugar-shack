@@ -5,6 +5,7 @@ using System.Text.Json.Serialization;
 using maplr_api.Interfaces;
 using maplr_api.Repository;
 using maplr_api.BusinessLayers;
+using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -20,6 +21,28 @@ builder.Services.AddSwaggerGen(config =>
 {
     // Convert int to strings in enum on swagger
     config.SchemaFilter<EnumSchemaFilter>();
+    config.AddSecurityDefinition("basic", new OpenApiSecurityScheme
+    {
+        Name = "Authorization",
+        Type = SecuritySchemeType.Http,
+        Scheme = "basic",
+        In = ParameterLocation.Header,
+        Description = "Basic Authorization header using the Bearer scheme."
+    });
+    config.AddSecurityRequirement(new OpenApiSecurityRequirement
+                {
+                    {
+                          new OpenApiSecurityScheme
+                            {
+                                Reference = new OpenApiReference
+                                {
+                                    Type = ReferenceType.SecurityScheme,
+                                    Id = "basic"
+                                }
+                            },
+                            new string[] {}
+                    }
+                });
 });
 
 #region Adding Automapper to convert from Models to DTO
