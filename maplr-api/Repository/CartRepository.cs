@@ -4,6 +4,7 @@ using maplr_api.DTO;
 using maplr_api.Interfaces;
 using maplr_api.Models;
 using Microsoft.EntityFrameworkCore;
+using maplr_api.Mappers;
 
 namespace maplr_api.Repository
 {
@@ -12,32 +13,10 @@ namespace maplr_api.Repository
         private readonly MaplrContext _context;
         private readonly IMapper _mapper;
 
-        public CartRepository(MaplrContext maplrContext)
+        public CartRepository(MaplrContext maplrContext, IMapper mapper)
         {
             _context = maplrContext;
-            _mapper = InitializeAutomapper();
-        }
-
-        private static Mapper InitializeAutomapper()
-        {
-            var config = new MapperConfiguration(cfg =>
-            {
-                cfg.CreateMap<Carts, CartLineDto>();
-
-                cfg.CreateMap<CartLineDto, Carts>();
-            });
-            var mapper = new Mapper(config);
-            return mapper;
-        }
-
-        private CartLineDto CartToCartLineDto(Carts carts)
-        {
-            return _mapper.Map<CartLineDto>(carts);
-        }
-
-        private Carts CartLineDtoToCarts(CartLineDto cartLineDto)
-        {
-            return _mapper.Map<Carts>(cartLineDto);
+            _mapper = MapFields.InitializeRepositoryAutomapper();
         }
 
         public Task<IQueryable<CartLineDto>> Get(string productId = "")
@@ -61,7 +40,7 @@ namespace maplr_api.Repository
                     var responseList = new List<CartLineDto>();
                     foreach (Carts carts in data)
                     {
-                        responseList.Add(CartToCartLineDto(carts));
+                        responseList.Add(_mapper.Map<CartLineDto>(carts));
                     }
                     return responseList.AsQueryable();
                 }
@@ -76,7 +55,7 @@ namespace maplr_api.Repository
                 var carts = _context.Carts.AsNoTracking().FirstOrDefault(x => x.ProductId.Equals(key));
                 if (carts != null)
                 {
-                    return CartToCartLineDto(carts);
+                    return _mapper.Map<CartLineDto>(carts);
                 }
                 return null;
             });
@@ -86,7 +65,7 @@ namespace maplr_api.Repository
         {
             return Task.Run(() =>
             {
-                var cart = CartLineDtoToCarts(entity);
+                var cart = _mapper.Map<Carts>(entity);
                 _context.Add(cart);
                 _context.SaveChanges();
                 return entity;
@@ -108,7 +87,7 @@ namespace maplr_api.Repository
         {
             return Task.Run(() =>
             {
-                var cart = CartLineDtoToCarts(entity);
+                var cart = _mapper.Map<Carts>(entity);
                 _context.Update(cart);
                 _context.SaveChanges();
                 return entity;

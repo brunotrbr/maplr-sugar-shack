@@ -2,6 +2,7 @@
 using maplr_api.Context;
 using maplr_api.DTO;
 using maplr_api.Interfaces;
+using maplr_api.Mappers;
 using maplr_api.Models;
 
 namespace maplr_api.Repository
@@ -14,36 +15,14 @@ namespace maplr_api.Repository
         public OrderRepository(MaplrContext maplrContext)
         {
             _context = maplrContext;
-            _mapper = InitializeAutomapper();
-        }
-
-        private static Mapper InitializeAutomapper()
-        {
-            var config = new MapperConfiguration(cfg =>
-            {
-                cfg.CreateMap<Orders, OrderLineDto>();
-
-                cfg.CreateMap<OrderLineDto, Orders>();
-            });
-            var mapper = new Mapper(config);
-            return mapper;
-        }
-
-        private Orders OrderLineDtoToOrders(OrderLineDto orderLineDto)
-        {
-            return _mapper.Map<Orders>(orderLineDto);
-        }
-
-        private OrderLineDto OrdersToOrderLineDto(Orders orders)
-        {
-            return _mapper.Map<OrderLineDto>(orders);
+            _mapper = MapFields.InitializeRepositoryAutomapper();
         }
 
         public Task<OrderLineDto> Insert(OrderLineDto entity)
         {
             return Task.Run(() =>
             {
-                _context.Add(OrderLineDtoToOrders(entity));
+                _context.Add(_mapper.Map<Orders>(entity));
                 _context.SaveChanges();
                 return entity;
             });
@@ -56,7 +35,7 @@ namespace maplr_api.Repository
                 var orders = new List<Orders>();
                 foreach (OrderLineDto orderDto in entities)
                 {
-                    orders.Add(OrderLineDtoToOrders(orderDto));
+                    orders.Add(_mapper.Map<Orders>(orderDto));
                 }
                 _context.AddRangeAsync(orders);
                 _context.SaveChanges();
@@ -74,7 +53,7 @@ namespace maplr_api.Repository
                     var responseList = new List<OrderLineDto>();
                     foreach(Orders order in data)
                     {
-                        responseList.Add(OrdersToOrderLineDto(order));
+                        responseList.Add(_mapper.Map<OrderLineDto>(order));
                     }
                     return responseList.AsQueryable();
                 }

@@ -2,6 +2,7 @@
 using maplr_api.Context;
 using maplr_api.DTO;
 using maplr_api.Interfaces;
+using maplr_api.Mappers;
 using maplr_api.Models;
 using maplr_api.Repository;
 using maplr_api.Utils;
@@ -22,25 +23,7 @@ namespace maplr_api.Controllers
         {
             _cartRepository = cartRepository;
             _mapleSyrupRepository = mapleSyrupRepository;
-            _mapper = InitializeAutomapper();
-        }
-
-        private static Mapper InitializeAutomapper()
-        {
-            var config = new MapperConfiguration(cfg =>
-            {
-                cfg.CreateMap<MapleSyrupDto, CartLineDto>()
-                  .ForSourceMember(src => src.Description, opt => opt.DoNotValidate())
-                  .ForSourceMember(src => src.Type, opt => opt.DoNotValidate())
-                  .AfterMap((src, dest) => { dest.ProductId = src.Id; dest.Qty = src.Stock > 0 ? 1 : 0; });
-            });
-            var mapper = new Mapper(config);
-            return mapper;
-        }
-
-        private CartLineDto MapleSyrupDtoToCartLineDto(MapleSyrupDto mapleSyrupDto)
-        {
-            return _mapper.Map<CartLineDto>(mapleSyrupDto);
+            _mapper = MapFields.InitializeControllerAutomapper();
         }
 
         [HttpGet]
@@ -73,7 +56,7 @@ namespace maplr_api.Controllers
                 return NotFound(error);
             }
 
-            var mappedDto = MapleSyrupDtoToCartLineDto(mapleSyrupDto);
+            var mappedDto = _mapper.Map<CartLineDto>(mapleSyrupDto);
             _ = await _cartRepository.Update(mappedDto);
 
             return Accepted();

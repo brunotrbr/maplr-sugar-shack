@@ -1,12 +1,7 @@
 ﻿using maplr_api.DTO;
 using maplr_api.Interfaces;
-using maplr_api.Models;
-using maplr_api.Repository;
 using maplr_api.Utils;
 using Microsoft.AspNetCore.Mvc;
-using System.Linq.Expressions;
-
-// For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
 namespace maplr_api.Controllers
 {

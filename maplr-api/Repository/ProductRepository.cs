@@ -2,6 +2,7 @@
 using maplr_api.Context;
 using maplr_api.DTO;
 using maplr_api.Interfaces;
+using maplr_api.Mappers;
 using maplr_api.Models;
 using maplr_api.Utils;
 using System.Linq.Expressions;
@@ -16,30 +17,7 @@ namespace maplr_api.Repository
         public ProductRepository(MaplrContext maplrContext)
         {
             _context = maplrContext;
-            _mapper = InitializeAutomapper();
-        }
-
-        private static Mapper InitializeAutomapper()
-        {
-            var config = new MapperConfiguration(cfg => {
-                cfg.CreateMap<MapleSyrup, CatalogueItemDto>()
-                  .ForSourceMember(src => src.Description, opt => opt.DoNotValidate())
-                   .AfterMap((src, dest) => dest.MaxQty = src.Stock);
-
-                cfg.CreateMap<MapleSyrup, MapleSyrupDto>();
-            });
-            var mapper = new Mapper(config);
-            return mapper;
-        }
-
-        private CatalogueItemDto mapleSyrupToCatalogueDto(MapleSyrup mapleSyrup)
-        {
-            return _mapper.Map<CatalogueItemDto>(mapleSyrup);
-        }
-
-        private MapleSyrupDto mapleSyrupToDto(MapleSyrup mapleSyrup)
-        {
-            return _mapper.Map<MapleSyrupDto>(mapleSyrup);
+            _mapper = MapFields.InitializeRepositoryAutomapper();
         }
 
         public Task<IQueryable<CatalogueItemDto>> Get(Enums.Type type)
@@ -62,7 +40,7 @@ namespace maplr_api.Repository
                     var responseList = new List<CatalogueItemDto>();
                     foreach (MapleSyrup mapleSyrup in data)
                     {
-                        responseList.Add(mapleSyrupToCatalogueDto(mapleSyrup));
+                        responseList.Add(_mapper.Map<CatalogueItemDto>(mapleSyrup));
                     }
                     return responseList.AsQueryable();
                 }
@@ -77,7 +55,7 @@ namespace maplr_api.Repository
                 var mapleSyrup = _context.MapleSyrup.FirstOrDefault(x => x.Id.Equals(key));
                 if(mapleSyrup != null)
                 {
-                    return mapleSyrupToDto(mapleSyrup);
+                    return _mapper.Map<MapleSyrupDto>(mapleSyrup);
                 }
                 return null;
             });

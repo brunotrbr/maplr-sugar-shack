@@ -7,6 +7,7 @@ using maplr_api.Repository;
 using AutoMapper;
 using maplr_api.Models;
 using maplr_api.DTO;
+using maplr_api.Mappers;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -42,7 +43,6 @@ options.UseInMemoryDatabase("MaplrDB"));
 #region Adding Data Generator
 
 builder.Services.AddTransient<DataGenerator>();
-
 #endregion
 
 var app = builder.Build();
@@ -70,6 +70,5 @@ using (var scope = scopedFactory.CreateScope())
     service.InsertData();
 }
 #endregion
-
 
 app.Run();
