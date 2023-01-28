@@ -10,7 +10,7 @@ namespace maplr_api.Repository
     public class CartRepository : ICartRepository
     {
         private readonly MaplrContext _context;
-        public readonly IMapper _mapper;
+        private readonly IMapper _mapper;
 
         public CartRepository(MaplrContext maplrContext)
         {

@@ -1,16 +1,19 @@
-﻿namespace maplr_api.Models
+﻿using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
+
+namespace maplr_api.Models
 {
     public class Orders
     {
-        public int Id { get; set; }
+        [Key]
+        [JsonPropertyName("productId")]
         public string ProductId { get; set; }
+
+        [JsonPropertyName("qty")]
         public int Qty { get; set; }
 
-        public Orders(int id, string productId, int qty)
+        public Orders()
         {
-            Id = id;
-            ProductId = productId;
-            Qty = qty;
         }
     }
 }

@@ -14,9 +14,9 @@ namespace maplr_api.Controllers
     [ApiController]
     public class ProductsController : ControllerBase
     {
-        private readonly IMapleSyrupRepository _mapleSyrupRepository;
+        private readonly IProductRepository _mapleSyrupRepository;
 
-        public ProductsController(IMapleSyrupRepository mapleSyrupRepository)
+        public ProductsController(IProductRepository mapleSyrupRepository)
         {
             _mapleSyrupRepository = mapleSyrupRepository;
         }

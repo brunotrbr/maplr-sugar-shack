@@ -8,12 +8,12 @@ using System.Linq.Expressions;
 
 namespace maplr_api.Repository
 {
-    public class MapleSyrupRepository : IMapleSyrupRepository
+    public class ProductRepository : IProductRepository
     {
         private readonly MaplrContext _context;
-        public readonly IMapper _mapper;
+        private readonly IMapper _mapper;
 
-        public MapleSyrupRepository(MaplrContext maplrContext)
+        public ProductRepository(MaplrContext maplrContext)
         {
             _context = maplrContext;
             _mapper = InitializeAutomapper();

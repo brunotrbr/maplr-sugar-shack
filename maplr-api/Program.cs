@@ -26,8 +26,9 @@ builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
 #region Repository Dependency Injection
 
-builder.Services.AddScoped(typeof(IMapleSyrupRepository),typeof(MapleSyrupRepository));
+builder.Services.AddScoped(typeof(IProductRepository),typeof(ProductRepository));
 builder.Services.AddScoped(typeof(ICartRepository),typeof(CartRepository));
+builder.Services.AddScoped(typeof(IOrderRepository),typeof(OrderRepository));
 
 #endregion
 

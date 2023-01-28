@@ -15,10 +15,10 @@ namespace maplr_api.Controllers
     public class CartController : ControllerBase
     {
         private readonly ICartRepository _cartRepository;
-        private readonly IMapleSyrupRepository _mapleSyrupRepository;
-        public readonly IMapper _mapper;
+        private readonly IProductRepository _mapleSyrupRepository;
+        private readonly IMapper _mapper;
 
-        public CartController(ICartRepository cartRepository, IMapleSyrupRepository mapleSyrupRepository)
+        public CartController(ICartRepository cartRepository, IProductRepository mapleSyrupRepository)
         {
             _cartRepository = cartRepository;
             _mapleSyrupRepository = mapleSyrupRepository;
