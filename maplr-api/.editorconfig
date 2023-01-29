@@ -2,3 +2,6 @@
 
 # CS8600: Conversão de literal nula ou possível valor nulo em tipo não anulável.
 dotnet_diagnostic.CS8600.severity = silent
+
+# CS8601: Possível atribuição de referência nula.
+dotnet_diagnostic.CS8601.severity = silent
