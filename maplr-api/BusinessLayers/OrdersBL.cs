@@ -20,11 +20,16 @@ namespace maplr_api.BusinessLayers
         {
             return Task.Run(() =>
             {
+                List<string> errors = new List<string>();
+                if (ordersDto.Count <= 0)
+                {
+                    errors.Add($"Empty order");
+                    return errors;
+                }
+
                 var repOrdersDto = _orderRepository.Get().Result;
                 var cartsDto = _cartRepository.Get().Result;
                 var productsDto = _productRepository.Get(0).Result;
-
-                List<string> errors = new List<string>();
 
                 if (repOrdersDto.Any())
                 {
