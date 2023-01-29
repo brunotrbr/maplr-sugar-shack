@@ -6,6 +6,8 @@ using maplr_api.Interfaces;
 using maplr_api.Repository;
 using maplr_api.BusinessLayers;
 using Microsoft.OpenApi.Models;
+using maplr_api.Authentication;
+using Microsoft.AspNetCore.Authentication;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -21,6 +23,7 @@ builder.Services.AddSwaggerGen(config =>
 {
     // Convert int to strings in enum on swagger
     config.SchemaFilter<EnumSchemaFilter>();
+    config.SwaggerDoc("v1", new OpenApiInfo { Title = "BasicAuth", Version = "v1" });
     config.AddSecurityDefinition("basic", new OpenApiSecurityScheme
     {
         Name = "Authorization",
@@ -30,19 +33,19 @@ builder.Services.AddSwaggerGen(config =>
         Description = "Basic Authorization header using the Bearer scheme."
     });
     config.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        {
+                new OpenApiSecurityScheme
                 {
+                    Reference = new OpenApiReference
                     {
-                          new OpenApiSecurityScheme
-                            {
-                                Reference = new OpenApiReference
-                                {
-                                    Type = ReferenceType.SecurityScheme,
-                                    Id = "basic"
-                                }
-                            },
-                            new string[] {}
+                        Type = ReferenceType.SecurityScheme,
+                        Id = "basic"
                     }
-                });
+                },
+                new string[] {}
+        }
+    });
 });
 
 #region Adding Automapper to convert from Models to DTO
@@ -51,9 +54,9 @@ builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
 #region Repository Dependency Injection
 
-builder.Services.AddScoped(typeof(IProductRepository),typeof(ProductRepository));
-builder.Services.AddScoped(typeof(ICartRepository),typeof(CartRepository));
-builder.Services.AddScoped(typeof(IOrderRepository),typeof(OrderRepository));
+builder.Services.AddScoped(typeof(IProductRepository), typeof(ProductRepository));
+builder.Services.AddScoped(typeof(ICartRepository), typeof(CartRepository));
+builder.Services.AddScoped(typeof(IOrderRepository), typeof(OrderRepository));
 
 #endregion
 
@@ -74,6 +77,18 @@ builder.Services.AddTransient<DataGenerator>();
 builder.Services.AddScoped<OrdersBL>();
 #endregion
 
+
+builder.Services.AddAuthentication("BasicAuthentication")
+    .AddScheme<AuthenticationSchemeOptions, BasicAuthenticationHandler>("BasicAuthentication", null);
+
+builder.Services.AddScoped<IAuthenticate, Authenticate>();  
+
+//builder.Services.AddAuthentication(options =>
+//{
+//    options.AddScheme<AuthenticationHandler>("Basic", null); // Pode ser que essa linha não seja necessária
+//    options.DefaultAuthenticateScheme = "Basic";
+//    options.DefaultChallengeScheme = "Basic";
+//});
 var app = builder.Build();
 
 // // Configure the HTTP request pipeline.
@@ -87,6 +102,8 @@ var app = builder.Build();
 app.UseSwagger();
 app.UseSwaggerUI();
 
+app.UseRouting();
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();

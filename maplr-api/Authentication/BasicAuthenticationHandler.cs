@@ -8,14 +8,11 @@ using System.Text.Encodings.Web;
 
 namespace maplr_api.Authentication
 {
-    public class AuthenticationHandler : AuthenticationHandler<AuthenticationSchemeOptions>
+    public class BasicAuthenticationHandler : AuthenticationHandler<AuthenticationSchemeOptions>
     {
-        #region Property  
         readonly IAuthenticate _authenticate;
-        #endregion
-
-        #region Constructor  
-        public AuthenticationHandler(IAuthenticate authenticate,
+  
+        public BasicAuthenticationHandler(IAuthenticate authenticate,
             IOptionsMonitor<AuthenticationSchemeOptions> options,
             ILoggerFactory logger,
             UrlEncoder encoder,
@@ -24,7 +21,6 @@ namespace maplr_api.Authentication
         {
             _authenticate = authenticate;
         }
-        #endregion
 
         protected override async Task<AuthenticateResult> HandleAuthenticateAsync()
         {
