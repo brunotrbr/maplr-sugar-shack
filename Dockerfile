@@ -25,14 +25,14 @@ WORKDIR /app
 COPY --from=publish /app/publish .
 ENTRYPOINT ["dotnet", "maplr-api.dll"]
 
-## TestMaplrSugarShack
+## test-maplr-api
 FROM build-api as build-tests
 WORKDIR /src
 
-RUN dotnet restore "TestMaplrSugarShack/TestMaplrSugarShack.csproj" 
+RUN dotnet restore "test-maplr-api/test-maplr-api.csproj" 
 
 WORKDIR "/src/."
-RUN dotnet build "TestMaplrSugarShack/TestMaplrSugarShack.csproj" -c Release -o /app/build
+RUN dotnet build "test-maplr-api/test-maplr-api.csproj" -c Release -o /app/build
 
 FROM build-tests AS testrunner
 WORKDIR /app/build
