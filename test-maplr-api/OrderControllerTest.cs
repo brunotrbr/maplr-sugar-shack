@@ -23,6 +23,10 @@ namespace test_maplr_api
             return Convert.ToBase64String(textAsBytes);
         }
 
+        public static StringContent GenerateStringContent(string json_serialized){
+            return new StringContent(json_serialized, Encoding.UTF8, MediaTypeNames.Application.Json);
+        }
+
         public void ValidateResponse(OrderValidationResponseDto expected, HttpResponseMessage httpResponse)
         {
             var ovrDTO = JsonConvert.DeserializeObject<OrderValidationResponseDto>(httpResponse.Content.ReadAsStringAsync().Result);
@@ -92,8 +96,8 @@ namespace test_maplr_api
             var orders = new List<OrderLineDto>();
             var orderLineDto = new OrderLineDto() { ProductId = DARK, Qty = 1 };
             orders.Add(orderLineDto);
-            var json = (JsonConvert.SerializeObject(orders));
-            var stringContent = new StringContent(json, Encoding.UTF8, MediaTypeNames.Application.Json);
+            var stringContent = GenerateStringContent(JsonConvert.SerializeObject(orders));
+
 
             // Act
             var httpResponse = await _httpClient.PostAsync("order", stringContent);
@@ -109,8 +113,7 @@ namespace test_maplr_api
         {
             // Arrange
             var orders = new List<OrderLineDto>();
-            var json = (JsonConvert.SerializeObject(orders));
-            var stringContent = new StringContent(json, Encoding.UTF8, MediaTypeNames.Application.Json);
+            var stringContent = GenerateStringContent(JsonConvert.SerializeObject(orders));
             var expected = new OrderValidationResponseDto(false, new string[] { "Empty order" });
             
             // Act
@@ -131,8 +134,7 @@ namespace test_maplr_api
             var orders = new List<OrderLineDto>();
             var orderLineDto = new OrderLineDto() { ProductId = DARK, Qty = 1 };
             orders.Add(orderLineDto);
-            var json = (JsonConvert.SerializeObject(orders));
-            var stringContent = new StringContent(json, Encoding.UTF8, MediaTypeNames.Application.Json);
+            var stringContent = GenerateStringContent(JsonConvert.SerializeObject(orders));
             var expected = new OrderValidationResponseDto(true, new string[] {  });
 
             // Act - First Order
@@ -149,6 +151,98 @@ namespace test_maplr_api
             httpResponse = await _httpClientAuth.PostAsync("order", stringContent);
 
             // Assert - Second Order
+            Assert.That(httpResponse.StatusCode, Is.EqualTo(HttpStatusCode.OK));
+            ValidateResponse(expected, httpResponse);
+        }
+
+        [Test]
+        public async Task TestPlaceOrder__cart_has_product_order_not_in_cart__expected_order_invalid()
+        {
+            // Arrange
+            AddToCart(CLEAR);
+            var orders = new List<OrderLineDto>();
+            var orderLineDto = new OrderLineDto() { ProductId = CLEAR, Qty = 2 };
+            orders.Add(orderLineDto);
+            var stringContent = GenerateStringContent(JsonConvert.SerializeObject(orders));
+            var expected = new OrderValidationResponseDto(false, new string[] { $"ProductId {CLEAR} has different quantities in order and in cart." });
+
+            // Act
+            var httpResponse = await _httpClientAuth.PostAsync("order", stringContent);
+
+            // Assert
+            Assert.That(httpResponse.StatusCode, Is.EqualTo(HttpStatusCode.OK));
+            ValidateResponse(expected, httpResponse);
+        }
+
+        [Test]
+        public async Task TestPlaceOrder__cart_has_product_order_qty_differ_from_cart__expected_order_invalid()
+        {
+            // Arrange
+            AddToCart(DARK);
+            var orders = new List<OrderLineDto>();
+            var orderLineDto = new OrderLineDto() { ProductId = AMBER, Qty = 1 };
+            orders.Add(orderLineDto);
+            var stringContent = GenerateStringContent(JsonConvert.SerializeObject(orders));
+            var expected = new OrderValidationResponseDto(false, new string[] { $"ProductId {AMBER} not in cart" });
+
+            // Act
+            var httpResponse = await _httpClientAuth.PostAsync("order", stringContent);
+
+            // Assert
+            Assert.That(httpResponse.StatusCode, Is.EqualTo(HttpStatusCode.OK));
+            ValidateResponse(expected, httpResponse);
+        }
+
+        [Test]
+        public async Task TestPlaceOrder__cart_has_no_product_order_not_in_cart__expected_order_invalid()
+        {
+            // Arrange
+            var orders = new List<OrderLineDto>();
+            var orderLineDto = new OrderLineDto() { ProductId = AMBER, Qty = 1 };
+            orders.Add(orderLineDto);
+            var stringContent = GenerateStringContent(JsonConvert.SerializeObject(orders));
+            var expected = new OrderValidationResponseDto(false, new string[] { $"ProductId {AMBER} not in cart" });
+
+            // Act
+            var httpResponse = await _httpClientAuth.PostAsync("order", stringContent);
+
+            // Assert
+            Assert.That(httpResponse.StatusCode, Is.EqualTo(HttpStatusCode.OK));
+            ValidateResponse(expected, httpResponse);
+        }
+
+        [Test]
+        public async Task TestPlaceOrder__order_qty_greather_than_stock__expected_order_invalid()
+        {
+            // Arrange
+            var orders = new List<OrderLineDto>();
+            var orderLineDto = new OrderLineDto() { ProductId = AMBER, Qty = 100 };
+            orders.Add(orderLineDto);
+            var stringContent = GenerateStringContent(JsonConvert.SerializeObject(orders));
+            var expected = new OrderValidationResponseDto(false, new string[] { $"ProductId {AMBER} quantity is greather than quantity in stock" });
+
+            // Act
+            var httpResponse = await _httpClientAuth.PostAsync("order", stringContent);
+
+            // Assert
+            Assert.That(httpResponse.StatusCode, Is.EqualTo(HttpStatusCode.OK));
+            ValidateResponse(expected, httpResponse);
+        }
+
+        [Test]
+        public async Task TestPlaceOrder__product_not_in_catalogue__expected_order_invalid()
+        {
+            // Arrange
+            var orders = new List<OrderLineDto>();
+            var orderLineDto = new OrderLineDto() { ProductId = "other", Qty = 100 };
+            orders.Add(orderLineDto);
+            var stringContent = GenerateStringContent(JsonConvert.SerializeObject(orders));
+            var expected = new OrderValidationResponseDto(false, new string[] { $"ProductId other not in catalogue" });
+
+            // Act
+            var httpResponse = await _httpClientAuth.PostAsync("order", stringContent);
+
+            // Assert
             Assert.That(httpResponse.StatusCode, Is.EqualTo(HttpStatusCode.OK));
             ValidateResponse(expected, httpResponse);
         }
