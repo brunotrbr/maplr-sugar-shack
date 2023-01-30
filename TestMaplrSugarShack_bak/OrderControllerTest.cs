@@ -5,9 +5,9 @@ using Newtonsoft.Json;
 using System.Net;
 using System.Net.Mime;
 using System.Text;
-using TestMaplrSugarShack.TestConfig;
+using test_maplr_api.TestConfig;
 
-namespace TestMaplrSugarShack
+namespace test_maplr_api
 {
     public class Tests
     {

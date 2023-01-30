@@ -1,7 +1,7 @@
 version: '3.4'
 
 services:
-  maplrapi:
+  maplr-api:
     image: maplr_api
     ports:
       - 8080:8080
@@ -10,7 +10,7 @@ services:
       dockerfile: Dockerfile
       target: final
   
-  tests:
+  maplr-api-tests:
     image: maplr_api_tests
     build:
       context: .
@@ -21,7 +21,7 @@ services:
     command: [
       "dotnet",
       "test",
-      "TestMaplrSugarShack.dll",
+      "test-maplr-api.dll",
       ]
     depends_on:
-      - maplrapi
+      - maplr-api
