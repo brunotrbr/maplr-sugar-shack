@@ -8,16 +8,14 @@ services:
     ports:
       - 8080:8080
     build:
-      context: .
+      context: maplr-api
       dockerfile: Dockerfile
-      target: final
   
   tests:
     image: maplr_api_tests
     build:
-      context: .
+      context: TestMaplrSugarShack
       dockerfile: Dockerfile
-      target: testrunner
     environment:
       - ASPNETCORE_ENVIRONMENT=docker
     command: [
