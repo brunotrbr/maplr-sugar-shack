@@ -6,7 +6,7 @@ namespace maplr_api.Interfaces
     {
         Task<OrderLineDto?> Insert(OrderLineDto entity);
         Task InsertRange(List<OrderLineDto> entities);
-
+        Task<string> Delete(string key);
         Task<IQueryable<OrderLineDto>> Get();
     }
 }

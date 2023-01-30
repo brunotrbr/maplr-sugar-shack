@@ -19,7 +19,7 @@ services:
     command: [
       "dotnet",
       "test",
-      "test-maplr-api.dll",
+      "maplr-api-tests.dll",
       ]
     depends_on:
       - maplr-api

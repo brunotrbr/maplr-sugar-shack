@@ -60,5 +60,16 @@ namespace maplr_api.Repository
                 return new List<OrderLineDto>().AsQueryable();
             });
         }
+
+        public Task<string> Delete(string key)
+        {
+            return Task.Run(() =>
+            {
+                var entity = _context.Orders.First(x => x.ProductId.Equals(key));
+                _context.Remove(entity);
+                _context.SaveChanges();
+                return key;
+            });
+        }
     }
 }

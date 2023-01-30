@@ -29,10 +29,10 @@ ENTRYPOINT ["dotnet", "maplr-api.dll"]
 FROM build-api as build-tests
 WORKDIR /src
 
-RUN dotnet restore "test-maplr-api/test-maplr-api.csproj" 
+RUN dotnet restore "maplr-api-tests/maplr-api-tests.csproj" 
 
 WORKDIR "/src/."
-RUN dotnet build "test-maplr-api/test-maplr-api.csproj" -c Release -o /app/build
+RUN dotnet build "maplr-api-tests/maplr-api-tests.csproj" -c Release -o /app/build
 
 FROM build-tests AS testrunner
 WORKDIR /app/build
