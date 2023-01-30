@@ -31,6 +31,8 @@ namespace maplr_api.BusinessLayers
                 var cartsDto = _cartRepository.Get().Result;
                 var productsDto = _productRepository.Get(0).Result;
 
+                var productInCart = false;
+
                 if (repOrdersDto.Any())
                 {
                     var repeateds = (from x in repOrdersDto
@@ -53,11 +55,13 @@ namespace maplr_api.BusinessLayers
                     }
 
                     var diff_quantity_cart_order = (from x in ordersDto
-                                                    where (cartsDto.All(y => y.Qty != x.Qty))
+                                                    where (cartsDto.All(y => y.ProductId.Equals(x.ProductId) && y.Qty > 0 && y.Qty != x.Qty))
                                                     select x).Select(x => x.ProductId);
                     foreach (string productId in not_in_cart)
                     {
-                        errors.Add($"ProductId {productId} has different quantities in order and in cart.");
+                        if(cartsDto.Any(x => x.ProductId.Equals(productId))){
+                            errors.Add($"ProductId {productId} has different quantities in order and in cart.");
+                        }
                     }
                 }
                 else
@@ -91,7 +95,7 @@ namespace maplr_api.BusinessLayers
                 {
                     foreach (OrderLineDto orderDto in ordersDto)
                     {
-                        errors.Add($"ProductId {orderDto.ProductId} not registered in stock");
+                        errors.Add($"ProductId {orderDto.ProductId} not in catalogue");
                     }
                 }
                 return errors;

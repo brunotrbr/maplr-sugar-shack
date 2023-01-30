@@ -7,14 +7,12 @@ services:
       - 8080:8080
     build:
       context: .
-      dockerfile: Dockerfile
       target: final
   
   maplr-api-tests:
     image: maplr_api_tests
     build:
       context: .
-      dockerfile: Dockerfile
       target: testrunner
     environment:
       - ASPNETCORE_ENVIRONMENT=docker

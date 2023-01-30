@@ -175,15 +175,15 @@ namespace test_maplr_api
         }
 
         [Test]
-        public async Task TestPlaceOrder__cart_has_product_order_qty_differ_from_cart__expected_order_invalid()
+        public async Task TestPlaceOrder__order_has_product_qty_differ_from_cart__expected_order_invalid()
         {
             // Arrange
-            AddToCart(DARK);
+            AddToCart(AMBER);
             var orders = new List<OrderLineDto>();
-            var orderLineDto = new OrderLineDto() { ProductId = AMBER, Qty = 1 };
+            var orderLineDto = new OrderLineDto() { ProductId = AMBER, Qty = 5 };
             orders.Add(orderLineDto);
             var stringContent = GenerateStringContent(JsonConvert.SerializeObject(orders));
-            var expected = new OrderValidationResponseDto(false, new string[] { $"ProductId {AMBER} not in cart" });
+            var expected = new OrderValidationResponseDto(false, new string[] { $"ProductId {AMBER} has different quantities in order and in cart" });
 
             // Act
             var httpResponse = await _httpClientAuth.PostAsync("order", stringContent);
@@ -216,10 +216,10 @@ namespace test_maplr_api
         {
             // Arrange
             var orders = new List<OrderLineDto>();
-            var orderLineDto = new OrderLineDto() { ProductId = AMBER, Qty = 100 };
+            var orderLineDto = new OrderLineDto() { ProductId = DARK, Qty = 100 };
             orders.Add(orderLineDto);
             var stringContent = GenerateStringContent(JsonConvert.SerializeObject(orders));
-            var expected = new OrderValidationResponseDto(false, new string[] { $"ProductId {AMBER} quantity is greather than quantity in stock" });
+            var expected = new OrderValidationResponseDto(false, new string[] { $"ProductId {DARK} quantity is greather than quantity in stock" });
 
             // Act
             var httpResponse = await _httpClientAuth.PostAsync("order", stringContent);
@@ -237,7 +237,7 @@ namespace test_maplr_api
             var orderLineDto = new OrderLineDto() { ProductId = "other", Qty = 100 };
             orders.Add(orderLineDto);
             var stringContent = GenerateStringContent(JsonConvert.SerializeObject(orders));
-            var expected = new OrderValidationResponseDto(false, new string[] { $"ProductId other not in catalogue" });
+            var expected = new OrderValidationResponseDto(false, new string[] { "ProductId other not in cart", "ProductId other not in catalogue"  });
 
             // Act
             var httpResponse = await _httpClientAuth.PostAsync("order", stringContent);
