@@ -1,5 +1,3 @@
-# Please refer https://aka.ms/HTTPSinContainer on how to setup an https developer certificate for your ASP .NET Core service.
-
 version: '3.4'
 
 services:
@@ -7,9 +5,17 @@ services:
     image: maplr_api
     ports:
       - 8080:8080
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: final
   
   tests:
     image: maplr_api_tests
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: testrunner
     environment:
       - ASPNETCORE_ENVIRONMENT=docker
     command: [
