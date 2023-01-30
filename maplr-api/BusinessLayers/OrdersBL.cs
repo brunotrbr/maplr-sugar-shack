@@ -51,6 +51,14 @@ namespace maplr_api.BusinessLayers
                     {
                         errors.Add($"ProductId {productId} not in cart");
                     }
+
+                    var diff_quantity_cart_order = (from x in ordersDto
+                                                    where (cartsDto.All(y => y.Qty != x.Qty))
+                                                    select x).Select(x => x.ProductId);
+                    foreach (string productId in not_in_cart)
+                    {
+                        errors.Add($"ProductId {productId} has different quantities in order and in cart.");
+                    }
                 }
                 else
                 {
