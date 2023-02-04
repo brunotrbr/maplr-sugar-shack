@@ -27,7 +27,6 @@ Maplr Backend Technical Test
         <li><a href="#preparação-do-ambiente">Preparação do ambiente</a></li>
         <li><a href="#execução-do-programa">Execução do programa</a></li>
         <li><a href="#testes-unitários">Testes unitários</a></li>
-        <li><a href="#cobertura-de-código">Cobertura de código</a></li>
       </ul>
     </li>
     <li><a href="#licensa">Licensa</a></li>
@@ -40,221 +39,179 @@ Balanceamento de carga é muito importante em ambientes Cloud. Estamos sempre te
 
 Os servidores são máquinas virtuais que se auto criam para acomodar novos usuários. Cada servidor custa R$ 1,00 por tick e suporta no máximo umax usuários simultaneamente. Você deve ﬁnalizar servidores que não estão sendo mais usados. O desaﬁo é fazer um programa em Python que recebe usuários e os aloca nos servidores tentando manter o menor custo possível.
 
-**Input** 
-
-Um arquivo onde: a primeira linha possui o valor de ttask ;
-a segunda linha possui o valor de umax ;
-as demais linhas contém o número de novos usuários para cada tick.
-
-**Output**
-
-Um arquivo onde cada linha contém uma lista de servidores disponíveis no ﬁnal de cada tick , representado pelo número de usuários em cada servidor separados por vírgula e, ao ﬁnal, o custo total por utilização dos servidores
-
-**Limites** 
-
-1 ≤ ttask ≤ 10
-
-1 ≤ umax ≤ 10
-
-**Exemplo**
-
-input.txt
-
-> 4<br>
-> 2<br>
-> 1<br>
-> 3<br>
-> 0<br>
-> 1<br>
-> 0<br>
-> 1<br>
-
-output.txt
-> 1<br>
-> 2,2<br>
-> 2,2<br>
-> 2,2,1<br>
-> 1,2,1<br>
-> 2<br>
-> 2<br>
-> 1<br>
-> 1<br>
-> 0<br>
-> 15<br>
-
-
-**Detalhamento do exemplo**
-
-ttask = 4 (valor da primeira linha do input.txt)
-
-umax = 2 (valor da segundo linha do input.txt)
-
-| Tick | Input | Output | Explicação                                                                                                                 |
-|------|-------|--------|----------------------------------------------------------------------------------------------------------------------------|
-| 1    | 1     | 1      | 1 servidor para 1 usuário (1 servidor criado)                                                                              |
-| 2    | 3     | 2,2    | 2 servidores para 4 usuários (1 servidor criado)                                                                           |
-| 3    | 0     | 2,2    | 2 servidores para 4 usuários (nenhum servidor criado ou removido)                                                          |
-| 4    | 1     | 2,2,1  | 3 servidores para 5 usuários (1 servidor criado)                                                                           |
-| 5    | 0     | 1,2,1  | 3 servidores para 4 usuários (nenhum servidor criado ou removido)                                                          |
-| 6    | 1     | 2      | 1 servidor para 2 usuários (2 servidores removidos)                                                                        |
-| 7    |       | 2      | 1 servidores para 2 usuários (nenhum servidor criado ou removido)                                                          |
-| 8    |       | 1      | 1 servidor para 1 usuário (nenhum servidor criado ou removido)                                                             |
-| 9    |       | 1      | 1 servidor para 1 usuário (nenhum servidor criado ou removido)                                                             |
-| 10   |       | 0      | nenhum servidor e nenhum usuário (1 servidor removido)                                                                     |
-|      |       | 15     | Custo total: R$ 1,00 * 5 ticks (primeira VM) + R$ 1,00 * 4 ticks (segunda VM) + R$ 1,00 * 6 ticks (terceira VM) = R$ 15,00 |
-
 
 ## A solução
 
-Conforme solicitado, o programa foi escrito em Python 3, utilizando a IDE PyCharm Community.
+Conforme solicitado, o programa foi escrito em .NET 6, utilizando a IDE Visual Studio. Foram criados xxxxxxx (descrever tudo do projeto), e as chamadas dos endpoints podem ser via postman ou swagger.
+
+&nbsp;
+
+**Database** 
+
+Utilizaddo Entity Framework In memory
+Populado arquivo .json conforme abaixo, para alimentar o banco de dados na inicialização do programa (classe DataGenerator)
+
+```json
+[
+  {
+    "id": "f6fb258d-c33f-4de3-9288-253bc86234b0",
+    "name": "Amber Maple Syrup",
+    "description": "Winding Road 100% Pure Amber Maple Syrup",
+    "image": "https://www.windingroadmaple.ca/uploads/userfiles/images/bottles.png",
+    "price": 8.00,
+    "stock": 10,
+    "type": 1
+  },
+  {
+    "id": "880c684d-770b-4274-9891-c00e08d37f2f",
+    "name": "Dark Maple Syrup",
+    "description": "Winding Road 100% Pure Dark Maple Syrup",
+    "image": "https://www.windingroadmaple.ca/uploads/userfiles/images/bottles.png",
+    "price": 8.50,
+    "stock": 15,
+    "type": 2
+  },
+  {
+    "id": "d7e356c8-5aa1-4cc6-b5a8-c76f51d7906e",
+    "name": "Clear Maple Syrup",
+    "description": "Winding Road 100% Pure Clear Maple Syrup",
+    "image": "https://www.windingroadmaple.ca/uploads/userfiles/images/bottles.png",
+    "price": 7.50,
+    "stock": 18,
+    "type": 3
+  }
+]
+```
+
+&nbsp;
 
 ### Modelagem de classes para o problema proposto
 
-Para iniciar a resolução do problema, achei necessário modelar as classes para um melhor entendimento do que estava sendo exigido.
+A modelagem de classes foi realizada de acordo com o contrato estabelecido no teste.
 
-A classe Users praticamente não está sendo utilizada, mas era importante ressaltar que uma execução no servidor exige tanto uma tarefa quanto um usuário, e por esse motivo a classe foi criada.
+No contrato não consta referências a ID's/chaves primárias para armazenamento dos dados no banco de dados.  No início cheguei a definir ID's para as tabelas **order**, **product** e **cart**, mas optei por remover eles durante o desenvolvimento.
 
-O modelo de classes foi criado utilizando o programa [Draw IO](https://app.diagrams.net/). 
+O motivo de remover foi porque no contrato a inserção/remoção utilizava o productId somente. Nesse caso, eu poderia adicionar dois elementos no carrinho com o mesmo productId, mas na hora de remover teria a ambiguidade de não saber qual deveria ser removido. Neste caso, mantive o acordado no contrato.
 
-<div style="padding: 16px 0px 16px 16px; background-color: #fff"><img src="images/topaz_class_diagram.png" alt="diagrama_de_classes"></div>
+Entendo que o DTO do contrato é uma classe auxiliar para transporte dos dados entre as camadas do sistema, e que as models devem ser a representação do banco de dados. Contudo  optei por manter os dados do banco de dados iguais aos DTOs.
 
+&nbsp;
 
 #### Pré-requisitos
-    * Python 3 (versão 3.7.4 ou superior, disponível no site do [Python](https://www.python.org/downloads/))
+    .NET 6.0 e .NET CLI (Dotnet version 6.0.302. Not tested with other versions)
 
-    * PIP (versão 19.0.3 ou superior, disponível no site do [PIP](https://pip.pypa.io/en/stable/installation/))
+    Docker (Docker version 20.10.17. Not tested with other versions)
     
-    * unittest (framework instalado automaticamente junto com o Python 3 [unittest](https://docs.python.org/3/library/unittest.html))
+    Docker Compose (Docker Compose version v2.6.1. Not tested with other versions)
 
-    * coverage (versão 5.5, instalação via PIP, conforme documentação do [Coverage](https://coverage.readthedocs.io/en/coverage-5.5/))
+&nbsp;
 
 #### Preparação do ambiente
 
-*A instalação do Python 3 e do PIP não são cobertas nessa explicação. Por favor siga a documentação supra-citada.*
+*A instalação do .NET/.NET CLI, docker e docker-compose não são cobertas nessa explicação. Por favor siga a documentação supra-citada.*
 
-Tendo o Python 3 e o pip instalados na máquina, instale o coverage:
+&nbsp;
+
+Clone o programa do repositório https://github.com/brunotrbr/maplr-sugar-shack e entre no diretório:
 
 ```
-C:\temp\topaz-test> pip install coverage
+[Windows]
+PS C:\> git clone git@github.com:brunotrbr/maplr-sugar-shack.git
+PS C:\> cd maplr-sugar-shack
+
+[Linux]
+user@machine:~$ git clone git@github.com:brunotrbr/maplr-sugar-shack.git
+user@machine:~$ cd maplr-sugar-shack
 ```
+
+&nbsp;
+
+Para preparar o ambiente de execução, execute o seguinte script no terminal/console do seu computador:
+
+```
+[Windows]
+PS C:\maplr-sugar-shack> .\prepare_env.ps1
+
+[Linux]
+user@machine:maplr-sugar-shack$ source prepare_env.sh
+```
+
+&nbsp;
 
 #### Execução do programa
 
-Para executar o programa, clone a solução do github e entre no diretório do topaz-test
+Execute o comando docker-compose up para realizar o build do projeto e inicializar ele automaticamente:
 
 ```
-C:\temp\topaz-test> git clone https://github.com/brbmendes/topaz-test.git
-C:\temp\topaz-test> cd topaz-test
+[Windows]
+PS C:\maplr-sugar-shack> docker-compose up
+
+[Linux]
+user@machine:maplr-sugar-shack$ docker-compose up
 ```
 
-Caso esteja utilizando o Windows, utilize o comando abaixo:
+Alternativamente, utilize os comandos `dotnet xxx` para rodar os projetos de forma independente:
 
 ```
-C:\temp\topaz-test> python.exe ./src/main.py ./input/input.txt
+[Windows]
+// adicionar output
+
+[Linux]
+// adicionar output
 ```
 
-Onde:
-- **python.exe** é o caminho do executável do python em sua máquina
-- **./src/main.py** é o endereço do arquivo principal do programa
-- **./input/input.txt** é o arquivo de entrada
 
-Caso o programa execute com sucesso, vai ser impresso no console a seguinte mensagem:
+Caso o programa execute com sucesso, vai ser impresso no console a seguinte informação, referente aos testes criados para verificar se o endpoint **order** e as validações de pedidos repetidos estão funcionando corretamente:
+
 ```
-C:\temp\topaz-test> python.exe ./src/main.py ./input/input.txt
-
-O arquivo de saída output.txt foi gerado no caminho "topaz-test/output/output.txt"
-
-Fim do programa.
+// adicionar output
 ```
 
-Considerações:
-- Caso de algum problema na execução, em que o executável python.exe não seja encontrado, verifique o local do executável do python em seu computador, e ajuste o comando de acordo com a sua necessidade.
+Optei por criar testes de sistema somente para a OrderController pois ele automaticamente utiliza outras Controllers nas validações de pedido repetido, cobrindo assim mais pontos do sistema.
 
-- Caso não seja informado o programa de entrada, vai retornar a mensagem "Por favor informe um arquivo de entrada."
+Obs: 
 
-- Caso o arquivo esteja corrompido e não possa ser aberto, ou não exista, vai retornar a mensagem "Falha ao abrir o arquivo informado."
+Podem ser efetuados testes manuais em todos os endpoints disponibilizados no contrato, tanto através de ferramentas como o postman quanto pelo swagger no endereço http://localhost/swagger/index.html
 
-- Não foram realizados mais testes quanto ao tipo ou formato do arquivo de entrada. Pressupõe-se que o arquivo informado como entrada vai ser o esperado pelo programa.
+Considerações adicionais:
 
-#### Testes unitários
+autenticação somente em order
+
+IBaseController
+
+Put cart
+
+Mappers
+
+Order - pedidos para o mesmo productID
+
+
+&nbsp;
+
+#### Testes
 
 Para criação e execução dos testes unitários, foi utilizado o unittest.
 
 Para executar os testes, utilize o comando
 
 ```
-C:\temp\topaz-test> python.exe -m unittest -v
+[Windows]
+// adicionar output
+
+[Linux]
+// adicionar output
 ```
 
 E a suíte de testes deve executar, gerando a saída abaixo:
 
 ```
-C:\temp\topaz-test> python.exe -m unittest -v
-test_add_a_server (tests.test_accounting.TestAccounting) ... ok
-test_calculate_cost_usage_adding_a_server (tests.test_accounting.TestAccounting) ... ok
-test_calculate_cost_usage_without_add_server (tests.test_accounting.TestAccounting) ... ok
-test_default_value_cost_per_tick (tests.test_accounting.TestAccounting) ... ok
-test_get_set_cost_per_tick (tests.test_accounting.TestAccounting) ... ok
-test_start_accounting_without_servers (tests.test_accounting.TestAccounting) ... ok
-test_get_id (tests.test_job.TestJob) ... ok
-test_get_task (tests.test_job.TestJob) ... ok
-test_get_user (tests.test_job.TestJob) ... ok
-test_add_job_when_has_no_spaces_for_new_jobs (tests.test_server.TestServer) ... ok
-test_add_job_when_has_spaces_for_new_jobs (tests.test_server.TestServer) ... ok
-test_can_add_job_has_no_spaces_for_new_jobs (tests.test_server.TestServer) ... ok
-test_can_add_job_has_spaces_for_new_jobs (tests.test_server.TestServer) ... ok
-test_can_add_job_with_default_value (tests.test_server.TestServer) ... ok
-test_get_id (tests.test_server.TestServer) ... ok
-test_get_running_jobs_when_add_one_job (tests.test_server.TestServer) ... ok
-test_get_uptime (tests.test_server.TestServer) ... ok
-test_update_tasks_remove_finished (tests.test_server.TestServer) ... ok
-test_update_uptime (tests.test_server.TestServer) ... ok
-test_decrement_ticks (tests.test_task.TestTask) ... ok
-test_get_id (tests.test_task.TestTask) ... ok
-test_get_ticks (tests.test_task.TestTask) ... ok
-test_get_id (tests.test_user.TestUser) ... ok
+[Windows]
+// adicionar output
 
-----------------------------------------------------------------------
-Ran 23 tests in 0.011s
-
-OK
+[Linux]
+// adicionar output
 ```
 
-#### Cobertura de código
-
-Para execução da cobertura de código, foi utilizado o coverage.
-
-Para executar a análise de cobertura de código utilizando o coverage com unittest, e gerar o relatório, utilize o comando
-
-```
-C:\temp\topaz-test> coverage run -m unittest discover && coverage report
-```
-
-A saída do comando deve ser a abaixo:
-
-```
-C:\temp\topaz-test> coverage run -m unittest discover && coverage report
-.......................
-----------------------------------------------------------------------
-Ran 23 tests in 0.006s
-
-OK
-Name                          Stmts   Miss  Cover
--------------------------------------------------
-src\entities\accountings.py      18      0   100%
-src\entities\jobs.py             12      0   100%
-src\entities\servers.py          35      0   100%
-src\entities\tasks.py            11      0   100%
-src\entities\users.py             6      0   100%
-tests\__init__.py                 0      0   100%
-tests\test_accounting.py         41      1    98%
-tests\test_job.py                27      1    96%
-tests\test_server.py             73      1    99%
-tests\test_task.py               24      1    96%
-tests\test_user.py               15      1    93%
--------------------------------------------------
-TOTAL                           262      5    98%
-```
 
 ### Licensa
 
@@ -268,9 +225,7 @@ Distribuído sobre a licença MIT. Consulte o arquivo LICENSE para maiores infor
 
 
 
-[contributors-shield]: https://img.shields.io/github/contributors/brbmendes/topaz-test?style=for-the-badge
-[contributors-url]: https://github.com/brbmendes/topaz-test/graphs/contributors
-[license-shield]: https://img.shields.io/github/license/brbmendes/topaz-test?style=for-the-badge
-[license-url]: https://github.com/brunotrbr/topaz-test/blob/main/LICENSE.txt
+[contributors-shield]: https://img.shields.io/github/contributors/brunotrbr/maplr-sugar-shack?style=for-the-badge
+[contributors-url]: https://github.com/brunotrbr/maplr-sugar-shack/graphs/contributors
 [linkedin-shield]: https://img.shields.io/badge/-LinkedIn-black.svg?style=for-the-badge&logo=linkedin&colorB=555
 [linkedin-url]: https://www.linkedin.com/in/brunotrbr/
