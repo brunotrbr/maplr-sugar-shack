@@ -93,7 +93,7 @@ The class modelling was according the contract available in the test, with one s
 
 Products and Cart are using strings as keys (a GUID and productId, respectively) as defined in contract, and I created a sequential ID to orders (the change is to allow multiple orders, simulating an e-commerce with multiple clients), as database models.
 
-There is a problem of use the productId as identifier (best described in **Cart - multiple carts with same productID** at **additional considerations** section), but I prefer to not change the contract.
+There is a problem of use the productId as identifier (best described in **Cart - multiple carts with same productID** at <a href="#additional-considerations">Additional considerations</a> section), but I prefer to not change the contract.
 
 The DTOs were created according the contract.
 
@@ -232,7 +232,7 @@ I choose to write system tests only to OrderController because it uses others co
 
 They were written using NUnit Framework.
 
-To run the tests, you can use the command `docker-compose up` or `dotnet xxx`, as exemplified in **Running the program** section
+To run the tests, you can use the command `docker-compose up` or `dotnet xxx`, as exemplified in <a href="#running-the-program">Running the program</a> section
 
 &nbsp;
 
