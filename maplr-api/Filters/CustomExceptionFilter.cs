@@ -10,7 +10,7 @@ namespace maplr_api.Filters
         {
             context.Result = new ObjectResult(new
             {
-                message = "Ops! Ocorreu um erro inesperado."
+                message = "Ops! Unexpected error. Please try again later."
             })
             {
                 StatusCode = StatusCodes.Status500InternalServerError

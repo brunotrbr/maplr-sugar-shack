@@ -37,5 +37,11 @@ namespace maplr_api.Controllers
             }
             return Ok(product);
         }
+
+        [HttpPut]
+        public async Task<IActionResult> Put()
+        {
+            throw new Exception("Just a test");
+        }
     }
 }
