@@ -18,24 +18,24 @@ namespace maplr_api_tests
         const string DARK = "880c684d-770b-4274-9891-c00e08d37f2f";
         const string CLEAR = "d7e356c8-5aa1-4cc6-b5a8-c76f51d7906e";
 
-        public static string Base64Encode(string textToEncode)
+        private static string Base64Encode(string textToEncode)
         {
             byte[] textAsBytes = Encoding.UTF8.GetBytes(textToEncode);
             return Convert.ToBase64String(textAsBytes);
         }
 
-        public static StringContent GenerateStringContent(string json_serialized){
+        private static StringContent GenerateStringContent(string json_serialized){
             return new StringContent(json_serialized, Encoding.UTF8, MediaTypeNames.Application.Json);
         }
 
-        public void ValidateResponse(OrderValidationResponseDto expected, HttpResponseMessage httpResponse)
+        private void ValidateResponse(OrderValidationResponseDto expected, HttpResponseMessage httpResponse)
         {
             var ovrDTO = JsonSerializer.Deserialize<OrderValidationResponseDto>(httpResponse.Content.ReadAsStringAsync().Result);
             Assert.That(ovrDTO.IsOrderValid, Is.EqualTo(expected.IsOrderValid));
             Assert.That(ovrDTO.Errors, Is.EqualTo(expected.Errors));
         }
 
-        public void AddToCart(string productId)
+        private void AddToCart(string productId)
         {
             UriBuilder uriBuilder = new UriBuilder(TestConfig.ServiceUri);
             uriBuilder.Query = "";
@@ -47,7 +47,7 @@ namespace maplr_api_tests
             Assert.That(httpResponse.StatusCode, Is.EqualTo(HttpStatusCode.Accepted));
         }
 
-        public void ChangeCartQty(string productId, int newQty)
+        private void ChangeCartQty(string productId, int newQty)
         {
             UriBuilder uriBuilder = new UriBuilder(TestConfig.ServiceUri);
             uriBuilder.Query = "";
@@ -59,7 +59,7 @@ namespace maplr_api_tests
             Assert.That(httpResponse.StatusCode, Is.EqualTo(HttpStatusCode.Accepted));
         }
 
-        public void RemoveFromCart(string productId)
+        private void RemoveFromCart(string productId)
         {
             UriBuilder uriBuilder = new UriBuilder(TestConfig.ServiceUri);
             uriBuilder.Query = "";
@@ -143,38 +143,6 @@ namespace maplr_api_tests
             // Assert
             Assert.That(httpResponse.StatusCode, Is.EqualTo(HttpStatusCode.OK));
             ValidateResponse(expected, httpResponse);
-        }
-
-        [Test]
-        public async Task TestPlaceOrder__order_already_placed__expected_order_invalid()
-        {
-            // Arrange - Add to card
-            AddToCart(DARK);
-
-            // Arrange - First Order
-            var orders = new List<OrderLineDto>();
-            var orderLineDto = new OrderLineDto() { ProductId = DARK, Qty = 1 };
-            orders.Add(orderLineDto);
-            var stringContent = GenerateStringContent(JsonSerializer.Serialize(orders));
-            var expected = new OrderValidationResponseDto(true, new string[] {  });
-
-            // Act - First Order
-            var httpResponse = await _httpClientAuth.PostAsync("order", stringContent);
-
-            // Assert - First Order
-            Assert.That(httpResponse.StatusCode, Is.EqualTo(HttpStatusCode.OK));
-            ValidateResponse(expected, httpResponse);
-
-            // Arrange - Second order
-            expected = new OrderValidationResponseDto(false, new string[] { $"ProductId {DARK} already placed" });
-
-            // Act - Second Order
-            httpResponse = await _httpClientAuth.PostAsync("order", stringContent);
-
-            // Assert - Second Order
-            Assert.That(httpResponse.StatusCode, Is.EqualTo(HttpStatusCode.OK));
-            ValidateResponse(expected, httpResponse);
-            RemoveFromCart(DARK);
         }
 
         [Test]

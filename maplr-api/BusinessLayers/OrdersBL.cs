@@ -5,13 +5,11 @@ namespace maplr_api.BusinessLayers
 {
     public class OrdersBL
     {
-        private readonly IOrderRepository _orderRepository;
         private readonly IProductRepository _productRepository;
         private readonly ICartRepository _cartRepository;
 
-        public OrdersBL(IOrderRepository orderRepository, IProductRepository productRepository, ICartRepository cartRepository)
+        public OrdersBL(IProductRepository productRepository, ICartRepository cartRepository)
         {
-            _orderRepository = orderRepository;
             _productRepository = productRepository;
             _cartRepository = cartRepository;
         }
@@ -27,20 +25,8 @@ namespace maplr_api.BusinessLayers
                     return errors;
                 }
 
-                var repOrdersDto = _orderRepository.Get().Result;
                 var cartsDto = _cartRepository.Get().Result;
                 var productsDto = _productRepository.Get(0).Result;
-
-                if (repOrdersDto.Any())
-                {
-                    var repeateds = (from x in repOrdersDto
-                                 join y in ordersDto on x.ProductId equals y.ProductId
-                                 select x).Select(x => x.ProductId);
-                    foreach (string productId in repeateds)
-                    {
-                        errors.Add($"ProductId {productId} already placed");
-                    }
-                }
 
                 if (cartsDto.Any())
                 {
