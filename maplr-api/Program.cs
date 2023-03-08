@@ -83,12 +83,6 @@ builder.Services.AddAuthentication("BasicAuthentication")
 
 builder.Services.AddScoped<IAuthenticate, Authenticate>();  
 
-//builder.Services.AddAuthentication(options =>
-//{
-//    options.AddScheme<AuthenticationHandler>("Basic", null); // Pode ser que essa linha não seja necessária
-//    options.DefaultAuthenticateScheme = "Basic";
-//    options.DefaultChallengeScheme = "Basic";
-//});
 var app = builder.Build();
 
 // // Configure the HTTP request pipeline.
