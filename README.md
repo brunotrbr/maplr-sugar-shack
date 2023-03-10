@@ -45,7 +45,7 @@ Maplr has just opened a brand new sugar shack in the middle of Quebec, you will 
 ## The solution
 To solve the problem was created an API to handle sells and stocks.
 
-As demanded the program were created using .NET 6 with Visual Studio IDE. The endpoins could be testd using postman ou swagger.
+As demanded the program were created using .NET 6 with Visual Studio IDE. The endpoins could be tested using postman or swagger.
 
 &nbsp;
 
@@ -277,7 +277,7 @@ The best thing to avoid these validations at Place Order could be use an unique 
 &nbsp;
 
 #### Exceptions
-As you can see in Filters directory, a `CustomExceptionFilter` class has been created to handle unexpected errors in application (unexpected erros, in this context, are any erros not expected in controller's contract or custom validations). If this unexpected erros occurs, API catch them and send back to user an `Internal Server Error` (status code 500) with a friendly message, without show the stack trace. The request method, error message and stack trace are logged in console to further investigations of the cause by developers.
+As you can see in Filters directory, a `CustomExceptionFilter` class has been created to handle unexpected errors in application (unexpected erros, in this context, are any erros not expected in controller's contract or custom validations). If this unexpected erros occurs, API catch them and send back to user an `Internal Server Error` (status code 500) with a friendly message, without show the stack trace. The request method, error message and stack trace are logged in console for further investigations of the cause by developers.
 
 I know it's wrong turn errors 4xx or mask different 5xx into 500, but here is just to show that it's possible catch erros globally, specific for controllers or endpoints.
 
